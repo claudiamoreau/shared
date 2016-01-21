@@ -1,0 +1,13 @@
+#! /bin/sh
+
+
+for i in 1..22
+do
+
+	python /Users/cmoreau/Documents/Kyoto/scripts/IBDsharing_byPosition.py /Volumes/project/gravel/moreau_projects/Kyoto/data/phased/3_GERMLINE/chr"${i}".IBD.match /Volumes/project/gravel/moreau_projects/Kyoto/data/phased/2_PLINK/cMcorrected/chr"${i}".cM.map /Users/cmoreau/Documents/Kyoto/results/IBD/IBDsharing_positions_chr"${i}"_allIBD_bp.txt
+
+	segnum=$(wc -l < /Volumes/project/gravel/moreau_projects/Kyoto/data/phased/3_GERMLINE/chr"${i}".bp2cM.IBD.match)
+
+	Rscript /Users/cmoreau/Documents/Kyoto/scripts/countIBDseg.r ${i} ${segnum}
+
+done

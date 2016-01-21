@@ -1,0 +1,18 @@
+! /bin/sh
+
+#Oct 7, 2015
+
+param1=75000
+#for i in {1..22}
+#do
+i=21
+	infile=/Volumes/project/gravel/moreau_projects/Kyoto/data/phased/3_GERMLINE/"${param1}"_0.1_3.0/chr"${i}".bp2cM.IBD_filtered.match
+	mapfile=/Volumes/project/gravel/moreau_projects/Kyoto/data/phased/2_PLINK/cMcorrected/chr"${i}".cM.map
+	outfile=/Users/cmoreau/Documents/Kyoto/results/IBD/IBDsharing_positions_chr"${i}"_"${param1}".txt
+	segnum=$(wc -l < "${infile}")
+
+	python  /Users/cmoreau/Documents/Kyoto/scripts/IBDsharing_byPosition.py ${infile} ${mapfile} ${outfile}
+
+	#Rscript /Users/cmoreau/Documents/Kyoto/scripts/countIBDseg.r ${i} ${segnum} ${outfile} ${param1}
+
+#done

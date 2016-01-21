@@ -1,0 +1,109 @@
+################################
+#
+#Claudia Moreau
+#
+#14 avril 2015
+#
+#Calculating genetic contribution of all Qc founders
+#
+################################
+
+rm(list = ls());
+setwd("/Users/cmoreau/Documents/Kyoto/results/IBD/")
+getwd()
+
+args <- commandArgs(trailingOnly = TRUE)
+print (paste(length(args), " arguments"))
+#If called with 4 arguments:
+#Do 1 plot per page
+if (length(args)>1){
+	ichr <- as.numeric(args[1]) #chr
+	segnum <- as.numeric(args[2]) #num of IBD segments
+	filename<- (args[3]) #input file name
+	sufix<- as.numeric(args[4]) #filtered...or not...
+
+	print (ichr)
+	print (segnum)
+	print (filename)
+	print (sufix)
+
+
+	#Take file of number of pair of inds who share at each position
+	sharing<-read.table(filename,sep="\t",header=F,colClasses=c("character","numeric" ))
+	#sharing[1:10,]
+	myfile<-paste("chr",ichr,"_",sufix,".jpg",sep="")
+	jpeg(filename=myfile,width=8.5,height=8.5,units="in",res=600)
+	plot(x=1:length(sharing[,1]),y=sharing[,2],type="l",main=paste("Chr",ichr,"\n",segnum," IBD segments",sep=""),ylab="Count",xlab="Markers")
+	dev.off()
+
+#If called with 1 argument:
+#Do all plots in the same 
+}else{
+
+	sufix<- (args[1]) #input file name
+
+	#Take file of number of pair of inds who share at each position
+	myfile<-paste("/Users/cmoreau/Documents/Kyoto/results/IBD/IBDsharing_positions_allchr_",sufix,".jpg",sep="")
+	jpeg(filename=myfile,width=11,height=8.5,units="in",res=600)
+	par(mfrow=c(6,4))
+
+	for (i in 1:22){
+		ichr<-i
+		filename<-paste("/Users/cmoreau/Documents/Kyoto/results/IBD/IBDsharing_positions_chr",ichr,"_",sufix,".txt",sep="")
+		sharing<-read.table(filename,sep="\t",header=F,colClasses=c("character","numeric" ))
+		plot(x=1:length(sharing[,1]),y=sharing[,2],type="l",main=paste("Chr",ichr,sep=""),ylab="Count",xlab="Markers")
+	}
+	
+	dev.off()
+}
+
+#IBD corrected file
+#filename<-"3_GERMLINE/25000_0.1_3.0/chr21.bp2cM.IBD_filtered.match"
+#filename<-"3_GERMLINE/chr21.bp2cM.IBD.match"
+#IBD<-read.table(filename,sep="\t",header=F,colClasses=c(rep("character",4),rep("numeric",4),rep("character",2),rep("numeric",2),rep("character",1),rep("numeric",3) ))
+#IBD<-read.table(filename,sep="\t",header=F,colClasses=c(rep("character",4),rep("numeric",3),rep("character",2),rep("numeric",2),rep("character",1),rep("numeric",3) ))
+#IBD[1:10,]
+#dimnames(IBD)[[2]]<-c("ID1","ID1chr","ID2","ID2chr","chr","startcM","endcM","startpos","endpos","SNPs","lengthcM","units","toto1","toto2","toto3")
+
+#Map
+#filename<-"2_PLINK/cMcorrected/chr21.cM.map"
+#map<-read.table(filename,sep="\t",header=F,colClasses=c("numeric","character","numeric","numeric"))
+#map[1:10,]
+#length(map[,1])
+#map[map[,2]==36.997,]
+
+#Count IBD segments per position
+#Try with a loop...
+#i<-400
+#countIBDvec<-c()
+#print ("IBD length: ")
+#print (length(IBD[,1]))
+#for (i in 1:length(IBD[,1])){
+#	if (i %% 1000 == 0) {print (i)}
+#	countIBDvec <- c(countIBDvec,map[map[,3]>=IBD[i,6] & map[,3]<=IBD[i,7],3])
+#}
+#length(countIBDvec)
+
+
+#Look if IBD segs are spread with no significant pics in...
+#IBDdf <- as.data.frame(table(countIBDvec ))
+#length(IBDdf [,1])
+
+#myfile<-"/Users/cmoreau/Documents/Kyoto/data/chr21_allIBD.jpg"
+#jpeg(filename=myfile,width=8.5,height=11,units="in",res=600)
+#plot(x=c(1:length(IBDdf [,1])),y=IBDdf[,2],type="l",main=paste("Chr21\n",length(IBD[,1])," IBD segments",sep=""),ylab="Count",xlab="Markers")
+#dev.off()
+
+## Calculate total length of IBD for each pair of inds
+#IBD$ID12<-paste(IBD$ID1,IBD$ID2,sep="-")
+#lengthdf <- as.data.frame(xtabs(lengthcM ~ ID12, data = IBD))
+#lengthdf [1:10,]
+#IBD[IBD$ID12=="ID099395-ID112505", ]
+
+## Calculate no of IBD segments shared for each pair of inds
+#segnumdf <- as.data.frame(table(IBD$ID12))
+#segnumdf [1:10,]
+#IBD[IBD$ID12=="ID099395-ID112505", ]
+#segnumdf [segnumdf [,1]=="ID099395-ID112505",]
+
+q()
