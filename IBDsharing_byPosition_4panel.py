@@ -2,20 +2,21 @@
 #Oct 7, 2015
 
 import sys
+import collections as col
 from sys import argv
 import numpy as np
 
 #Files path must be passed in argument
 datafile = sys.argv[1] 
-print "Data is in : " + datafile
+print "Data files are in : " + datafile
 mapfile = sys.argv[2] 
-print "Map is in : " + mapfile
+print "Map files are in : " + mapfile
 samplefilename = sys.argv[3] 
 print "Sample file : " + samplefilename
 outputfilename = sys.argv[4] 
 print "Output file : " + outputfilename
 indseq = int(sys.argv[5]) 
-print "No of individuals to output in the panel : " + str(indseq)
+print "No of individuals in the panel : " + str(indseq)
 
 #loads IBD file
 #Receives IBD file name (GERMLINE formatted)
@@ -74,7 +75,7 @@ def loadsamplefile (samplefile):
 def writefile (outputfilename,ind_dict,final_big_list):
     outputfile = open(outputfilename, "w") #To append to file foreach chr
     for i in final_big_list:
-        outputfile.write(str(i) + "\t" + str(len(ind_dict[i])) + "\n")
+        outputfile.write(str(i) + "\t" + str(len(list(ind_dict[i].elements()))) + "\n")
 
     outputfile.close()
 
@@ -88,7 +89,7 @@ def findbiggest (ind_dict,final_big_list):
 
     for sample in ind_dict:
         if sample not in final_big_list:
-            tmplength=len(ind_dict[sample])
+            tmplength=len(list(ind_dict[sample].elements()))
             if tmplength>=biggestlength:
                 biggestlength=tmplength
                 chosensample=sample
@@ -100,22 +101,26 @@ def findbiggest (ind_dict,final_big_list):
 #Receives the most representative guy
 #Returns dict without clauses
 def removeclauses (ind_dict,big,final_big_list):
-    big_list = ind_dict[big]
+    print 'biggest: ' + big
+    ## To remove the '-' from the Counter...if not Counter does stupid things...
+    #print ind_dict[big]
+    tmplist = col.Counter(list(ind_dict[big].elements()))
+    #print tmplist
 
-    for sample in big_list:
+    for sample in tmplist:
         ## I don't want to remove clauses for samples already chosen as most representative
+        #print sample
         if sample not in final_big_list:
-            #print sample
-            #print (len(ind_dict[sample]))
-            #print "Removing clauses..."
-            for clause in big_list:
-                ## I only want to remove one occurence of a clause in case
-                ## there are more than one as indivuals are considered as haploid chromosomes
-                if clause in ind_dict[sample]:
-                    ind_dict[sample].remove(clause)
-            if big in ind_dict[sample]:
-                ind_dict[sample].remove(big)
-            #print (len(ind_dict[sample]))
+
+            #print len(list(ind_dict[sample].elements()))
+            #print ind_dict[sample]
+            ind_dict[sample].subtract(tmplist)
+
+            ## To remove the biggest himself!!
+            del ind_dict[sample][big]
+            #print len(list(ind_dict[sample].elements()))
+            #print ind_dict[sample]
+
 
     return (ind_dict)
 
@@ -131,12 +136,12 @@ ind_dict = dict()
 
 #For all chr...
 for j in range(1,22):
-
+    #j=21
     #Loading files
-    print 'loading data file...'
+    print 'loading ' + datafile + "chr" + str(j) + ".bp2cM.IBD_filtered.match"
     data = loadfile(datafile + "chr" + str(j) + ".bp2cM.IBD_filtered.match")
     print str(len(data[0])) + " segments"
-    print 'loading map file...'
+    print 'loading ' + mapfile + "chr" + str(j) + ".cM.map"
     positions = loadmapfile(mapfile + "chr" + str(j) + ".cM.map")
     print str(len(positions)) + " positions"
 
@@ -160,6 +165,12 @@ for j in range(1,22):
             ind_dict[data[1][i]].append(data[0][i])
 
 
+## Transform the list in the dict in dict with number of occurences
+for sample in ind_dict:
+    c = col.Counter(ind_dict[sample])
+    ind_dict[sample] = c
+
+
 ## List of most representative samples in order
 final_big_list = list()
 print 'Finding most representative samples...'
@@ -167,8 +178,8 @@ print 'Finding most representative samples...'
 ## Take the second biggest and so on...
 
 for i in range(indseq):
-    if i%10==0:
-        print str(i) + ' done on ' + str(indseq)
+    #if i%10==0:
+    print str(i) + ' done on ' + str(indseq)
         
     biggest = findbiggest(ind_dict,final_big_list)
     if biggest == '':

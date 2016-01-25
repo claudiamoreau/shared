@@ -7,9 +7,9 @@ infile=/Volumes/project/gravel/moreau_projects/Kyoto/data/phased/3_GERMLINE/1500
 
 mapfile=/Volumes/project/gravel/moreau_projects/Kyoto/data/phased/2_PLINK/cMcorrected/
 samplefile=/Volumes/project/gravel/moreau_projects/Kyoto/data/unphased/Kyoto_unrelated_notinbred_nohh_nohet_250Ksnps.fam
-outfile=/Users/cmoreau/Documents/Kyoto/results/IBD/clauses_byPosition_allchr_150000.txt
+outfile=/Users/cmoreau/Documents/Kyoto/results/IBD/clauses_byPosition_allchr_150000_2.txt
 numind=10
 
-python /Users/cmoreau/Documents/Kyoto/scripts/buildFile4panel/IBDsharing_byPosition_4panel.py ${infile} ${mapfile} ${samplefile} ${outfile} ${numind}
+python /Users/cmoreau/Documents/shared/IBDsharing_byPosition_4panel.py ${infile} ${mapfile} ${samplefile} ${outfile} ${numind}
 
 
